@@ -1384,7 +1384,7 @@ class BucketCreate(Subcommand):
                            type=(int), help="The interval in minutes for continuous backup")
         group.add_argument("--continuous-backup-retention-period", dest="continuous_backup_retention_period",
                            metavar="<hours>", type=(int),
-                           help="The retention period in hours for continuous backup (0 to disable, max 876000)")
+                           help="The retention period in hours for continuous backup (max 3600 or 60 days)")
 
     @rest_initialiser(cluster_init_check=True, version_check=True, enterprise_check=False)
     def execute(self, opts):
@@ -1401,8 +1401,12 @@ class BucketCreate(Subcommand):
             _exit_if_errors(["--continuous-backup-interval cannot be lower than 2 minutes"])
 
         if (opts.continuous_backup_retention_period is not None and
-                opts.continuous_backup_retention_period > 876000):
-            _exit_if_errors(["--continuous-backup-retention-period cannot be greater than 876000 hours"])
+                opts.continuous_backup_retention_period > 3600):
+            _exit_if_errors(["--continuous-backup-retention-period cannot be greater than 3600 hours"])
+
+        if (opts.continuous_backup_retention_period is not None or opts.continuous_backup_enabled) and \
+                opts.continuous_backup_retention_period == 0:
+            _exit_if_errors(["--continuous-backup-retention-period must be between 1 and 3600"])
 
         if opts.hlc_max_future_threshold is not None and opts.hlc_max_future_threshold < 10:
             _exit_if_errors(["--hlc-max-future-threshold cannot be lower than 10"])

@@ -821,30 +821,26 @@ class TestBucketCreate(CommandTest):
 
     def test_bucket_create_continuous_backup_retention_period_max(self):
         args = ['--continuous-backup-enabled', '1', '--continuous-backup-location', '/backup/location',
-                '--continuous-backup-interval', '60', '--continuous-backup-retention-period', '876000']
+                '--continuous-backup-interval', '60', '--continuous-backup-retention-period', '3600']
         self.no_error_run(self.command + self.command_args + self.command_couch_args + args, self.server_args)
         expected_params = [
             'bucketType=couchbase', 'name=name', 'evictionPolicy=fullEviction', 'replicaNumber=0', 'ramQuotaMB=100',
             'storageBackend=magma', 'rank=3', 'numVBuckets=128',
             'continuousBackupEnabled=true', 'continuousBackupLocation=%2Fbackup%2Flocation',
-            'continuousBackupInterval=60', 'continuousBackupRetentionPeriod=876000',
+            'continuousBackupInterval=60', 'continuousBackupRetentionPeriod=3600',
         ]
         self.rest_parameter_match(expected_params)
 
     def test_bucket_create_continuous_backup_retention_period_too_high(self):
         args = ['--continuous-backup-enabled', '1', '--continuous-backup-location', '/backup/location',
-                '--continuous-backup-interval', '60', '--continuous-backup-retention-period', '876001']
+                '--continuous-backup-interval', '60', '--continuous-backup-retention-period', '3601']
         self.system_exit_run(self.command + self.command_args + self.command_couch_args + args, self.server_args)
-        self.assertIn('--continuous-backup-retention-period cannot be greater than 876000 hours', self.str_output)
+        self.assertIn('--continuous-backup-retention-period cannot be greater than 3600 hours', self.str_output)
 
     def test_bucket_create_continuous_backup_retention_period_zero(self):
         args = ['--continuous-backup-retention-period', '0']
-        self.no_error_run(self.command + self.command_args + self.command_couch_args + args, self.server_args)
-        expected_params = [
-            'bucketType=couchbase', 'name=name', 'evictionPolicy=fullEviction', 'replicaNumber=0', 'ramQuotaMB=100',
-            'storageBackend=magma', 'rank=3', 'numVBuckets=128', 'continuousBackupRetentionPeriod=0',
-        ]
-        self.rest_parameter_match(expected_params)
+        self.system_exit_run(self.command + self.command_args + self.command_couch_args + args, self.server_args)
+        self.assertIn('--continuous-backup-retention-period must be between 1 and 3600', self.str_output)
 
     def test_bucket_create_continuous_backup_retention_period_CE(self):
         self.server_args['enterprise'] = False

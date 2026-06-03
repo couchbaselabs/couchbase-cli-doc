@@ -259,7 +259,7 @@ Short intervals will use more disk space.
 
 --continuous-backup-retention-period <hours>::
 The retention period for continuous backup data. Setting this to 0 disables
-continuous backup retention. The maximum value is 876000 hours (100 years).
+continuous backup retention. The maximum value is 3600 hours (60 days).
 
 include::{partialsdir}/cbcli/part-common-history-retention.adoc[]
 
