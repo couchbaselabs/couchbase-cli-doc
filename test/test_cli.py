@@ -756,7 +756,7 @@ class TestBucketCreate(CommandTest):
                       self.str_output)
 
     def test_bucket_create_reserved(self):
-        self.no_error_run(self.command + self.command_args + self.command_couch_args + ['--reserved', '2000'],
+        self.no_error_run(self.command + self.command_args + self.command_couch_args + ['--throttle-reserved', '2000'],
                           self.server_args)
         expected_params = [
             'bucketType=couchbase', 'name=name', 'evictionPolicy=fullEviction', 'replicaNumber=0', 'ramQuotaMB=100',
@@ -765,7 +765,8 @@ class TestBucketCreate(CommandTest):
         self.rest_parameter_match(expected_params)
 
     def test_bucket_create_hard_limit(self):
-        self.no_error_run(self.command + self.command_args + self.command_couch_args + ['--hard-limit', '3000'],
+        self.no_error_run(self.command + self.command_args + self.command_couch_args +
+                          ['--throttle-hard-limit', '3000'],
                           self.server_args)
         expected_params = [
             'bucketType=couchbase', 'name=name', 'evictionPolicy=fullEviction', 'replicaNumber=0', 'ramQuotaMB=100',
@@ -1065,7 +1066,7 @@ class TestBucketEdit(CommandTest):
 
     def test_bucket_edit_reserved(self):
         self.server_args['buckets'].append(self.bucket_membase)
-        self.no_error_run(self.command + self.command_args + self.command_couch_args + ['--reserved', '2000'],
+        self.no_error_run(self.command + self.command_args + self.command_couch_args + ['--throttle-reserved', '2000'],
                           self.server_args)
         expected_params = [
             'evictionPolicy=fullEviction', 'flushEnabled=1', 'threadsNumber=8', 'replicaNumber=0', 'ramQuotaMB=100',
@@ -1075,7 +1076,8 @@ class TestBucketEdit(CommandTest):
 
     def test_bucket_edit_hard_limit(self):
         self.server_args['buckets'].append(self.bucket_membase)
-        self.no_error_run(self.command + self.command_args + self.command_couch_args + ['--hard-limit', '3000'],
+        self.no_error_run(self.command + self.command_args + self.command_couch_args +
+                          ['--throttle-hard-limit', '3000'],
                           self.server_args)
         expected_params = [
             'evictionPolicy=fullEviction', 'flushEnabled=1', 'threadsNumber=8', 'replicaNumber=0', 'ramQuotaMB=100',

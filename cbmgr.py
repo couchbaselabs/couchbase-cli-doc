@@ -1370,9 +1370,9 @@ class BucketCreate(Subcommand):
             type=(int),
             help="The number of seconds of acceptable drift at which new CAS values will be accepted")
 
-        group.add_argument("--reserved", dest="throttle_reserved", metavar="<number>", type=(int),
+        group.add_argument("--throttle-reserved", dest="throttle_reserved", metavar="<number>", type=(int),
                            help="The guaranteed resource usage reserved for this bucket (units/s)")
-        group.add_argument("--hard-limit", dest="throttle_hard_limit", metavar="<number>", type=(int),
+        group.add_argument("--throttle-hard-limit", dest="throttle_hard_limit", metavar="<number>", type=(int),
                            help="If set, the bucket will be throttled at this limit regardless of any capacity "
                            "left over (units/s)")
 
@@ -1657,9 +1657,9 @@ class BucketEdit(Subcommand):
             type=(int),
             help="The number of seconds of acceptable drift at which new CAS values will be accepted")
 
-        group.add_argument("--reserved", dest="throttle_reserved", metavar="<number>", type=(int),
+        group.add_argument("--throttle-reserved", dest="throttle_reserved", metavar="<number>", type=(int),
                            help="The guaranteed resource usage reserved for this bucket (units/s)")
-        group.add_argument("--hard-limit", dest="throttle_hard_limit", metavar="<number>", type=(int),
+        group.add_argument("--throttle-hard-limit", dest="throttle_hard_limit", metavar="<number>", type=(int),
                            help="If set, the bucket will be throttled at this limit regardless of any capacity "
                            "left over (units/s)")
 
