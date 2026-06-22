@@ -35,6 +35,8 @@ _couchbase-cli bucket-create_ [--cluster <url>] [--username <user>]
     [--throttle-reserved <number>] [--throttle-hard-limit <number>]
     [--continuous-backup-enabled <0|1>] [--continuous-backup-location <location>]
     [--continuous-backup-interval <minutes>] [--continuous-backup-retention-period <hours>]
+    [--continuous-backup-km-key-url <url>] [--continuous-backup-km-cred-id <cred-id>]
+    [--continuous-backup-cloud-storage-cred-id <cred-id>]
 
 == DESCRIPTION
 
@@ -289,6 +291,17 @@ Short intervals will use more disk space.
 --continuous-backup-retention-period <hours>::
 The retention period for continuous backup data. Setting this to 0 disables
 continuous backup retention. The maximum value is 3600 hours (60 days).
+
+--continuous-backup-km-key-url <url>::
+The KMS key URL used for continuous backup encryption. Supported schemes
+include "awskms://", "gcpkms://", and "azurekeyvault://".
+
+--continuous-backup-km-cred-id <cred-id>::
+The credential ID for the key management service used with continuous backup
+encryption.
+
+--continuous-backup-cloud-storage-cred-id <cred-id>::
+The credential ID for cloud object storage used with continuous backup.
 
 include::{partialsdir}/cbcli/part-common-history-retention.adoc[]
 

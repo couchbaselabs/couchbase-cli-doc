@@ -1385,6 +1385,15 @@ class BucketCreate(Subcommand):
         group.add_argument("--continuous-backup-retention-period", dest="continuous_backup_retention_period",
                            metavar="<hours>", type=(int),
                            help="The retention period in hours for continuous backup (max 3600 or 60 days)")
+        group.add_argument("--continuous-backup-km-key-url", dest="continuous_backup_km_key_url",
+                           metavar="<url>",
+                           help="The KMS key URL for continuous backup encryption")
+        group.add_argument("--continuous-backup-km-cred-id", dest="continuous_backup_km_cred_id",
+                           metavar="<cred-id>",
+                           help="The credential ID for the continuous backup key management service")
+        group.add_argument("--continuous-backup-cloud-storage-cred-id",
+                           dest="continuous_backup_cloud_storage_cred_id", metavar="<cred-id>",
+                           help="The credential ID for continuous backup cloud storage")
 
     @rest_initialiser(cluster_init_check=True, version_check=True, enterprise_check=False)
     def execute(self, opts):
@@ -1394,8 +1403,20 @@ class BucketCreate(Subcommand):
             _exit_if_errors(["Compression mode can only be configured on enterprise edition"])
         if (opts.continuous_backup_enabled is not None or opts.continuous_backup_location is not None or
             opts.continuous_backup_interval is not None or
-                opts.continuous_backup_retention_period is not None) and not self.enterprise:
+            opts.continuous_backup_retention_period is not None or
+            opts.continuous_backup_km_key_url is not None or
+            opts.continuous_backup_km_cred_id is not None or
+                opts.continuous_backup_cloud_storage_cred_id is not None) and not self.enterprise:
             _exit_if_errors(["Continuous backup can only be configured on enterprise edition"])
+
+        if opts.continuous_backup_enabled != "1" and (opts.continuous_backup_location is not None or
+                                                      opts.continuous_backup_interval is not None or
+                                                      opts.continuous_backup_retention_period is not None or
+                                                      opts.continuous_backup_km_key_url is not None or
+                                                      opts.continuous_backup_km_cred_id is not None or
+                                                      opts.continuous_backup_cloud_storage_cred_id is not None):
+            _exit_if_errors(["Continuous backup arguments cannot be used without enabling continuous backup"
+                             " (--continuous-backup-enabled 1)"])
 
         if opts.continuous_backup_interval is not None and opts.continuous_backup_interval < 2:
             _exit_if_errors(["--continuous-backup-interval cannot be lower than 2 minutes"])
@@ -1525,7 +1546,9 @@ class BucketCreate(Subcommand):
                                             dek_rotate_interval, dek_lifetime, opts.invalid_hlc_strategy,
                                             opts.hlc_max_future_threshold, opts.throttle_reserved, opts.throttle_hard_limit,
                                             opts.continuous_backup_enabled, opts.continuous_backup_location,
-                                            opts.continuous_backup_interval, opts.continuous_backup_retention_period)
+                                            opts.continuous_backup_interval, opts.continuous_backup_retention_period,
+                                            opts.continuous_backup_km_key_url, opts.continuous_backup_km_cred_id,
+                                            opts.continuous_backup_cloud_storage_cred_id)
         _exit_if_errors(errors)
         _success("Bucket created")
 
@@ -1672,7 +1695,15 @@ class BucketEdit(Subcommand):
         group.add_argument("--continuous-backup-retention-period", dest="continuous_backup_retention_period",
                            metavar="<hours>", type=(int),
                            help="The retention period in hours for continuous backup (0 to disable, max 876000)")
-
+        group.add_argument("--continuous-backup-km-key-url", dest="continuous_backup_km_key_url",
+                           metavar="<url>",
+                           help="The KMS key URL for continuous backup encryption")
+        group.add_argument("--continuous-backup-km-cred-id", dest="continuous_backup_km_cred_id",
+                           metavar="<cred-id>",
+                           help="The credential ID for the continuous backup key management service")
+        group.add_argument("--continuous-backup-cloud-storage-cred-id",
+                           dest="continuous_backup_cloud_storage_cred_id", metavar="<cred-id>",
+                           help="The credential ID for continuous backup cloud storage")
         group.add_argument("--enable-cross-cluster-versioning", dest="xcluster_versioning", action='store_true')
         group.add_argument("--force", dest="force", action='store_true')
 
@@ -1686,7 +1717,10 @@ class BucketEdit(Subcommand):
 
         if (opts.continuous_backup_enabled is not None or opts.continuous_backup_location is not None or
             opts.continuous_backup_interval is not None or
-                opts.continuous_backup_retention_period is not None) and not self.enterprise:
+            opts.continuous_backup_retention_period is not None or
+            opts.continuous_backup_km_key_url is not None or
+            opts.continuous_backup_km_cred_id is not None or
+                opts.continuous_backup_cloud_storage_cred_id is not None) and not self.enterprise:
             _exit_if_errors(["Continuous backup can only be configured on enterprise edition"])
 
         if opts.continuous_backup_interval is not None and opts.continuous_backup_interval < 2:
@@ -1795,7 +1829,9 @@ class BucketEdit(Subcommand):
                                           opts.hlc_max_future_threshold, opts.xcluster_versioning,
                                           opts.throttle_reserved, opts.throttle_hard_limit,
                                           opts.continuous_backup_enabled, opts.continuous_backup_location,
-                                          opts.continuous_backup_interval, opts.continuous_backup_retention_period)
+                                          opts.continuous_backup_interval, opts.continuous_backup_retention_period,
+                                          opts.continuous_backup_km_key_url, opts.continuous_backup_km_cred_id,
+                                          opts.continuous_backup_cloud_storage_cred_id)
         _exit_if_errors(errors)
 
         _success("Bucket edited")

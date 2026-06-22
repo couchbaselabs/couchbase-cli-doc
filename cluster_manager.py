@@ -1162,6 +1162,9 @@ class ClusterManager(object):
             continuous_backup_location,
             continuous_backup_interval,
             continuous_backup_retention_period,
+            continuous_backup_km_key_url,
+            continuous_backup_km_cred_id,
+            continuous_backup_cloud_storage_cred_id,
             timeout=60):
         url = f'{self.hostname}/pools/default/buckets'
 
@@ -1264,6 +1267,12 @@ class ClusterManager(object):
             params["continuousBackupInterval"] = continuous_backup_interval
         if continuous_backup_retention_period is not None:
             params["continuousBackupRetentionPeriod"] = continuous_backup_retention_period
+        if continuous_backup_km_key_url is not None:
+            params["continuous_backup_km_key_url"] = continuous_backup_km_key_url
+        if continuous_backup_km_cred_id is not None:
+            params["continuous_backup_km_cred_id"] = continuous_backup_km_cred_id
+        if continuous_backup_cloud_storage_cred_id is not None:
+            params["continuous_backup_cloud_storage_cred_id"] = continuous_backup_cloud_storage_cred_id
 
         result, errors = self._post_form_encoded(url, params)
         if errors:
@@ -1311,7 +1320,9 @@ class ClusterManager(object):
                     invalid_hlc_strategy=None, hlc_max_future_threshold=None, xcluster_versioning: bool = False,
                     throttle_reserved=None, throttle_hard_limit=None,
                     continuous_backup_enabled=None, continuous_backup_location=None, continuous_backup_interval=None,
-                    continuous_backup_retention_period=None):
+                    continuous_backup_retention_period=None,
+                    continuous_backup_km_key_url=None, continuous_backup_km_cred_id=None,
+                    continuous_backup_cloud_storage_cred_id=None):
         url = f'{self.hostname}/pools/default/buckets/{name}'
 
         if name is None:
@@ -1401,6 +1412,12 @@ class ClusterManager(object):
             params["continuousBackupInterval"] = continuous_backup_interval
         if continuous_backup_retention_period is not None:
             params["continuousBackupRetentionPeriod"] = continuous_backup_retention_period
+        if continuous_backup_km_key_url is not None:
+            params["continuous_backup_km_key_url"] = continuous_backup_km_key_url
+        if continuous_backup_km_cred_id is not None:
+            params["continuous_backup_km_cred_id"] = continuous_backup_km_cred_id
+        if continuous_backup_cloud_storage_cred_id is not None:
+            params["continuous_backup_cloud_storage_cred_id"] = continuous_backup_cloud_storage_cred_id
 
         return self._post_form_encoded(url, params)
 
