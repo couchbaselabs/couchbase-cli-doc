@@ -2694,7 +2694,28 @@ class TestSettingXdcr(CommandTest):
         self.assertIn('can only be configured on enterprise edition', self.str_output)
 
 
-# TODO: TestSettingMasterPassword
+class TestSettingMasterPassword(CommandTest):
+    def setUp(self):
+        self.command = ['couchbase-cli', 'setting-master-password'] + cluster_connect_args
+        self.server_args = {'enterprise': True, 'init': True, 'is_admin': True}
+        super(TestSettingMasterPassword, self).setUp()
+
+    def test_set_new_password(self):
+        self.no_error_run(self.command + ['--new-password', 'newpass'], self.server_args)
+        self.assertIn('POST:/node/controller/changeMasterPassword', self.server.trace)
+        self.rest_parameter_match(['newPassword=newpass'])
+
+    def test_rotate_data_key(self):
+        self.no_error_run(self.command + ['--rotate-data-key'], self.server_args)
+        self.assertIn('POST:/node/controller/rotateDataKey', self.server.trace)
+        self.rest_parameter_match([])
+
+    def test_rotate_password_source_script(self):
+        self.no_error_run(self.command, self.server_args)
+        self.assertIn('POST:/node/controller/changeMasterPassword', self.server.trace)
+        self.rest_parameter_match([])
+
+
 # TODO: TestRestCipherSuites
 
 class TestResetAdminPassword(unittest.TestCase):

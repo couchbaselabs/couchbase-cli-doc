@@ -4723,16 +4723,14 @@ class SettingMasterPassword(Subcommand):
 
     @rest_initialiser(version_check=True)
     def execute(self, opts):
-        if opts.new_password is not None:
-            _, errors = self.rest.set_master_pwd(opts.new_password)
-            _exit_if_errors(errors)
-            _success("New master password set")
-        elif opts.rotate_data_key:
+        if opts.rotate_data_key:
             _, errors = self.rest.rotate_master_pwd()
             _exit_if_errors(errors)
             _success("Data key rotated")
         else:
-            _exit_if_errors(["No parameters set"])
+            _, errors = self.rest.set_master_pwd(opts.new_password)
+            _exit_if_errors(errors)
+            _success("New master password set")
 
     @staticmethod
     def get_man_page_name():

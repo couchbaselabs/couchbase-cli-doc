@@ -435,9 +435,9 @@ class ClusterManager(object):
         url = f'{self.hostname}/node/controller/rotateDataKey'
         return self._post_form_encoded(url, None)
 
-    def set_master_pwd(self, password):
+    def set_master_pwd(self, password=None):
         url = f'{self.hostname}/node/controller/changeMasterPassword'
-        params = {"newPassword": password}
+        params = {"newPassword": password} if password is not None else None
         return self._post_form_encoded(url, params)
 
     def user_change_password(self, new_password):
