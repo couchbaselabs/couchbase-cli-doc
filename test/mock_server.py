@@ -578,6 +578,8 @@ endpoints = [
     (r'/node/controller/enableExternalListener', {'POST': do_nothing}),
     (r'/node/controller/disableUnusedExternalListeners', {'POST': do_nothing}),
     (r'/node/controller/loadTrustedCAs', {'POST': do_nothing}),
+    (r'/node/controller/changeMasterPassword$', {'POST': do_nothing}),
+    (r'/node/controller/rotateDataKey$', {'POST': do_nothing}),
     (r'/node/controller/reloadCertificate', {'POST': do_nothing}),
     (r'/node/controller/reloadClientCertificate', {'POST': do_nothing}),
     (r'/node/controller/setupNetConfig', {'POST': do_nothing}),
