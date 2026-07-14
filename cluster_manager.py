@@ -1574,12 +1574,17 @@ class ClusterManager(object):
 
         return self._post_form_encoded(url, params)
 
+    def get_global_memcached_settings(self):
+        url = f'{self.hostname}/pools/default/settings/memcached/global'
+        return self._get(url)
+
     def set_global_memcached_settings(
             self,
             node_capacity=None,
             throttle_enabled=None,
             read_unit_size=None,
-            write_unit_size=None):
+            write_unit_size=None,
+            snapshot_throttle_bytes=None):
         url = f'{self.hostname}/pools/default/settings/memcached/global'
         params = {}
 
@@ -1591,6 +1596,8 @@ class ClusterManager(object):
             params["read_unit_size"] = read_unit_size
         if write_unit_size is not None:
             params["write_unit_size"] = write_unit_size
+        if snapshot_throttle_bytes is not None:
+            params["snapshot_download_throttle_bytes"] = snapshot_throttle_bytes
 
         return self._post_form_encoded(url, params)
 
