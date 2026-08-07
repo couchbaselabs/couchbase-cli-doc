@@ -885,9 +885,15 @@ class ClusterManager(object):
         url = f'{self.hostname}/settings/rebalance'
         return self._get(url)
 
-    def set_settings_rebalance(self, rebalance_moves_per_node):
+    def set_settings_rebalance(self, rebalance_moves_per_node, file_based_moves_per_node):
         url = f'{self.hostname}/settings/rebalance'
-        params = {'rebalanceMovesPerNode': rebalance_moves_per_node}
+
+        params = {}
+        if rebalance_moves_per_node is not None:
+            params['rebalanceMovesPerNode'] = rebalance_moves_per_node
+        if file_based_moves_per_node is not None:
+            params['dataServiceFileBasedRebalanceMovesPerNode'] = file_based_moves_per_node
+
         return self._post_form_encoded(url, params)
 
     def set_settings_rebalance_retry(self, enabled, wait_for, max_attempts):
