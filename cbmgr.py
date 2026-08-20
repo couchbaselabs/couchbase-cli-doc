@@ -7017,6 +7017,11 @@ class SettingRebalance(Subcommand):
                            help="Maximum number of rebalance retires [1-3].")
         group.add_argument('--rebalance-id', metavar='<id>',
                            help='Specify the id of the failed rebalance to cancel the retry.')
+        group.add_argument('--file-based-throttle-rate', metavar='<bytes_per_sec>', type=int,
+                           help='The rate to throttle file based rebalances to in bytes/s. Default is 0 (no ' +
+                           'throttling)')
+        group.add_argument('--file-based-moves-per-node', metavar='<num>', type=int,
+                           help='The number of moves per node to allow during file based rebalances')
 
     @rest_initialiser(cluster_init_check=True, version_check=True, enterprise_check=False)
     def execute(self, opts):
@@ -7030,6 +7035,10 @@ class SettingRebalance(Subcommand):
                 retry_settings, err = self.rest.get_settings_rebalance_retry()
                 _exit_if_errors(err)
                 settings.update(retry_settings)
+
+                memcached_settings, err = self.rest.get_global_memcached_settings()
+                _exit_if_errors(err)
+                settings.update(memcached_settings)
             if opts.output == 'json':
                 print(json.dumps(settings))
             else:
@@ -7037,11 +7046,20 @@ class SettingRebalance(Subcommand):
                     print(f'Automatic rebalance retry {"enabled" if settings["enabled"] else "disabled"}')
                     print(f'Retry wait time: {settings["afterTimePeriod"]}')
                     print(f'Maximum number of retries: {settings["maxAttempts"]}')
-                print(f'Maximum number of vBucket move per node: {settings["rebalanceMovesPerNode"]}')
+
+                print(f'Maximum number of vBucket moves per node: {settings["rebalanceMovesPerNode"]}')
+                if self.enterprise:
+                    fileBasedMoves = settings["dataServiceFileBasedRebalanceMovesPerNode"]
+                    print(f'Maximum number of vBucket moves per node in file based rebalance: {fileBasedMoves}')
+                    print(f'File based throttle rate: {settings.get("snapshot_download_throttle_bytes", 0)} bytes/s')
         elif opts.set:
-            if (not self.enterprise and (opts.enable is not None or opts.wait_for is not None
-                                         or opts.max_attempts is not None)):
-                _exit_if_errors(["Automatic rebalance retry configuration is an Enterprise Edition only feature"])
+            if not self.enterprise:
+                if opts.enable is not None or opts.wait_for is not None or opts.max_attempts is not None \
+                        or opts.file_based_throttle_rate is not None:
+                    _exit_if_errors(["Automatic rebalance retry configuration is an Enterprise Edition only feature"])
+                if opts.file_based_throttle_rate is not None:
+                    _exit_if_errors(["File-based rebalances is an Enterprise Edition only feature"])
+
             if opts.enable == '1':
                 opts.enable = 'true'
             else:
@@ -7056,10 +7074,15 @@ class SettingRebalance(Subcommand):
                 _, err = self.rest.set_settings_rebalance_retry(opts.enable, opts.wait_for, opts.max_attempts)
                 _exit_if_errors(err)
 
-            if opts.moves_per_node is not None:
-                if not 1 <= opts.moves_per_node <= 64:
+            if opts.moves_per_node is not None or opts.file_based_moves_per_node is not None:
+                if opts.moves_per_node is not None and not 1 <= opts.moves_per_node <= 64:
                     _exit_if_errors(['--moves-per-node must be a value between 1 and 64'])
-                _, err = self.rest.set_settings_rebalance(opts.moves_per_node)
+
+                _, err = self.rest.set_settings_rebalance(opts.moves_per_node, opts.file_based_moves_per_node)
+                _exit_if_errors(err)
+
+            if opts.file_based_throttle_rate is not None:
+                _, err = self.rest.set_global_memcached_settings(snapshot_throttle_bytes=opts.file_based_throttle_rate)
                 _exit_if_errors(err)
 
             _success('Rebalance settings updated')

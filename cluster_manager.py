@@ -885,9 +885,15 @@ class ClusterManager(object):
         url = f'{self.hostname}/settings/rebalance'
         return self._get(url)
 
-    def set_settings_rebalance(self, rebalance_moves_per_node):
+    def set_settings_rebalance(self, rebalance_moves_per_node, file_based_moves_per_node):
         url = f'{self.hostname}/settings/rebalance'
-        params = {'rebalanceMovesPerNode': rebalance_moves_per_node}
+
+        params = {}
+        if rebalance_moves_per_node is not None:
+            params['rebalanceMovesPerNode'] = rebalance_moves_per_node
+        if file_based_moves_per_node is not None:
+            params['dataServiceFileBasedRebalanceMovesPerNode'] = file_based_moves_per_node
+
         return self._post_form_encoded(url, params)
 
     def set_settings_rebalance_retry(self, enabled, wait_for, max_attempts):
@@ -1574,12 +1580,17 @@ class ClusterManager(object):
 
         return self._post_form_encoded(url, params)
 
+    def get_global_memcached_settings(self):
+        url = f'{self.hostname}/pools/default/settings/memcached/global'
+        return self._get(url)
+
     def set_global_memcached_settings(
             self,
             node_capacity=None,
             throttle_enabled=None,
             read_unit_size=None,
-            write_unit_size=None):
+            write_unit_size=None,
+            snapshot_throttle_bytes=None):
         url = f'{self.hostname}/pools/default/settings/memcached/global'
         params = {}
 
@@ -1591,6 +1602,8 @@ class ClusterManager(object):
             params["read_unit_size"] = read_unit_size
         if write_unit_size is not None:
             params["write_unit_size"] = write_unit_size
+        if snapshot_throttle_bytes is not None:
+            params["snapshot_download_throttle_bytes"] = snapshot_throttle_bytes
 
         return self._post_form_encoded(url, params)
 

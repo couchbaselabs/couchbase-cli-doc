@@ -16,7 +16,7 @@ _couchbase-cli setting-rebalance [--cluster <url>] [--username <user>] [--passwo
     [--client-cert <path>] [--client-cert-password <password>] [--client-key <path>]
     [--client-key-password <password>] [--set] [--get] [--cancel] [--pending-info] [--enable <1|0>]
     [--wait-for <sec>] [--moves-per-node <num>] [--max-attempts <num>]
-    [--rebalance-id <id>]
+    [--rebalance-id <id>] [--file-based-throttle-rate <rate>] [--file-based-moves-per-node <num>]
 
 == DESCRIPTION
 
@@ -70,6 +70,14 @@ include::{partialsdir}/cbcli/part-common-options.adoc[]
   Specify the rebalance id of a failed rebalance. Use together with --cancel,
   to cancel a pending retry.
 
+--file-based-throttle-rate <rate>::
+  The rate to throttle the file based rebalances to in bytes/s. Default is 0
+  (no throttling).
+
+--file-based-moves-per-node <num>::
+  Specify the number of concurrent vBuckets to move per node during a file
+  based rebalance. A higher setting may improve rebalance performance, at the
+  cost of higher resource consumption.
 
 include::{partialsdir}/cbcli/part-host-formats.adoc[]
 

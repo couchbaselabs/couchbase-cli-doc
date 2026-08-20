@@ -4627,10 +4627,14 @@ class TestSettingRebalance(CommandTest):
 
     def test_get_human_friendly(self):
         self.server_args['/settings/retryRebalance'] = {"enabled": False, "afterTimePeriod": 300, "maxAttempts": 1}
-        self.server_args['/settings/rebalance'] = {"rebalanceMovesPerNode": 4}
+        self.server_args['/settings/rebalance'] = {"rebalanceMovesPerNode": 4,
+                                                   "dataServiceFileBasedRebalanceMovesPerNode": 8}
+        self.server_args['/pools/default/settings/memcached/global'] = {"snapshot_download_throttle_bytes": 1024}
         self.no_error_run(self.command + ['--get'], self.server_args)
         expected_output = ['Automatic rebalance retry disabled', 'Retry wait time: 300', 'Maximum number of retries: 1',
-                           'Maximum number of vBucket move per node: 4']
+                           'Maximum number of vBucket moves per node: 4',
+                           'Maximum number of vBucket moves per node in file based rebalance: 8',
+                           'File based throttle rate: 1024 bytes/s']
         for e in expected_output:
             self.assertIn(e, self.str_output)
 
@@ -4662,6 +4666,18 @@ class TestSettingRebalance(CommandTest):
         self.system_exit_run(self.command + ['--set', '--enable', '1', '--moves-per-node', '0'],
                              self.server_args)
         self.assertIn('--moves-per-node must be a value between 1 and 64', self.str_output)
+
+    def test_set_rebalance_throttle(self):
+        self.no_error_run(self.command + ['--set', '--file-based-throttle-rate', '1024'],
+                          self.server_args)
+        expected_params = ['enabled=false', 'snapshot_download_throttle_bytes=1024']
+        self.rest_parameter_match(expected_params)
+
+    def test_set_file_based_moves_per_node(self):
+        self.no_error_run(self.command + ['--set', '--file-based-moves-per-node', '16'],
+                          self.server_args)
+        expected_params = ['enabled=false', 'dataServiceFileBasedRebalanceMovesPerNode=16']
+        self.rest_parameter_match(expected_params)
 
 
 class TestAnalyticsLinkSetup(CommandTest):
